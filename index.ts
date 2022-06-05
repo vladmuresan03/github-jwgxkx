@@ -5,6 +5,7 @@
  */
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
+
 function initMap(): void {
   const map = new google.maps.Map(
     document.getElementById('map') as HTMLElement,
@@ -19,8 +20,8 @@ function initMap(): void {
   //   disableAutoPan: true,
   // });
 
-  // Create an array of alphabetical characters used to label the markers.
-  const labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  // // Create an array of alphabetical characters used to label the markers.
+  // const labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   const contentString =
     '<div id="content">' +
@@ -48,34 +49,55 @@ function initMap(): void {
     content: contentString,
   });
 
-  // Add some markers to the map.
+  var getJSON = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status === 200) {
+        callback(null, xhr.response);
+      } else {
+        callback(status, xhr.response);
+      }
+    };
+    xhr.send();
+  };
+
+  var res = "|";
+ getJSON('https://sharetext.me/raw/h58aksqvak',
+function(err, data) {
+  alert("r");
+  if (err !== null) {
+    alert('Something went wrong: ' + err);
+    res = err;
+  } else {
+    alert('Your query count: ' + data);
+    res = data;
+  }
+});
+
+  // Add some marker images to the map. TODO: chose based on category.
+
   const image =
     "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
   const markers = locations.map((position, i) => {
-    const label = labels[i % labels.length];
+    // const label = labels[i % labels.length];
     const marker = new google.maps.Marker({
       position: position,
-      label: label,
-      title: "Hello World!",
+      // label: label,
       icon: image
     });
 
+    
     marker.addListener("click", () => {
-      // invowindow.setContent("")
+      infowindow.setContent("ffff" + res),
       infowindow.open({
         anchor: marker,
         map,
         shouldFocus: false,
       });
     });
-  
-
-  //   // markers can only be keyboard focusable when they have click listeners
-  //   // open info window when marker is clicked
-  //   marker.addListener('click', () => {
-  //     infoWindow.setContent(label);
-  //     infoWindow.open(map, marker);
-  //   });
 
     return marker;
   });
