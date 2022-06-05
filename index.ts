@@ -5,6 +5,11 @@
  */
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
+function isInfoWindowOpen(infoWindow){
+  var map = infoWindow.getMap();
+  return (map !== null && typeof map !== "undefined");
+}
+
 function initMap(): void {
   const map = new google.maps.Map(
     document.getElementById('map') as HTMLElement,
@@ -14,9 +19,6 @@ function initMap(): void {
     }
   );
 
-  
-
-  ////
   var getJSON = function (url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -31,13 +33,18 @@ function initMap(): void {
     };
     xhr.send();
   };
-  var res;
+
+  interface MyInterface {
+    latitude: number;
+    longitude: number;
+    data: string;
+  }
   var eventDTOs: MyInterface[] = [];
 
   const image =
     'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+
   getJSON('https://treloc.com/events', function (err, data) {
-    // alert('r');
     if (err !== null) {
       alert('Something went wrong: ' + err);
     } else {
@@ -51,15 +58,18 @@ function initMap(): void {
           icon: image,
         });
 
-        
-  const infowindow = new google.maps.InfoWindow({});
+        const infowindow = new google.maps.InfoWindow({});
         marker.addListener('click', () => {
+          if (isInfoWindowOpen(infowindow)) {
+            infowindow.close()
+          } else {
           infowindow.setContent(eventDTO.data),
             infowindow.open({
               anchor: marker,
               map,
               shouldFocus: false,
             });
+          }
         });
 
         return marker;
@@ -70,7 +80,6 @@ function initMap(): void {
     }
   });
 }
-
 
 declare global {
   interface Window {
